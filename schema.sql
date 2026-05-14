@@ -1,7 +1,7 @@
 -- 1. Printer metadata
 CREATE TABLE PrinterModels(
     model_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    modle_name TEXT NOT NULL,
+    model_name TEXT NOT NULL,
     firmware_version TEXT
 );
 
@@ -10,7 +10,7 @@ CREATE TABLE Printers(
     printer_id INTEGER PRIMARY KEY AUTOINCREMENT,
     model_id INTEGER NOT NULL,
     serial_number TEXT UNIQUE NOT NULL,
-    purhcase_date DATE,
+    purchase_date DATE,
     last_maintenance_date DATE,
     FOREIGN KEY (model_id) REFERENCES PrinterModels(model_id)
 );
