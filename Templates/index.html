@@ -19,25 +19,49 @@
                 <div class="card shadow-sm mb-4">
                     <div class="card-body">
                         <h5 class="card-title">Quick Stats</h5>
-                        <p class="card-text text-muted">Active Projects: 0</p>
-                        <p class="card-text text-muted">Printers Online: 0</p>
+                        <p class="card-text">Active Projects: <strong>{{ p_count }}</strong></p>
+                        <p class="card-text">Printers Online: <strong>{{ pr_count }}</strong></p>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">New Project</h5>
+                        <form action="/project/add" method="POST">
+                            <input type="text" name="project_name" class="form-control mb-2" placeholder="Project Name" required>
+                            <button type="submit" class="btn btn-success w-100">Add to Queue</button>
+                        </form>
                     </div>
                 </div>
             </div>
+
             <div class="col-md-8">
-                <h3>Current Projects</h3>
+                <h3>Project Queue</h3>
                 <table class="table table-hover bg-white shadow-sm rounded">
                     <thead class="table-dark">
                         <tr>
-                            <th>Project Name</th>
+                            <th>Name</th>
                             <th>Status</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
+                        {% for project in projects %}
                         <tr>
-                            <td colspan="3" class="text-center text-muted py-4">No active projects found.</td>
+                            <td>{{ project.project_name }}</td>
+                            <td><span class="badge bg-primary">{{ project.status }}</span></td>
+                            <td>
+                                <form action="{{ url_for('start_print', id=project.project_id) }}" method="POST" style="display:inline;">
+                                    <button class="btn btn-sm btn-warning">Start Print</button>
+                                </form>
+                                <form action="{{ url_for('delete_project', id=project.project_id) }}" method="POST" style="display:inline;">
+                                    <button class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete?')">Delete</button>
+                                </form>
+                            </td>
                         </tr>
+                        {% else %}
+                        <tr><td colspan="3" class="text-center py-4">No projects found.</td></tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
