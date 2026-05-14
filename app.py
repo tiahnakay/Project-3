@@ -1,22 +1,22 @@
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
+from flask import Flask, render_template
+from extensions import db
 import os
 
-app = Flask(__name__)
-
-# Configure the SQLite database
-basedir = os.path.abspath(os.path.dirname(__file__))
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'inventory.db')
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-db = SQLAlchemy(app)
-from models import *
-
-# import models once created
-@app.route('/')
-def home():
-    return "3D Printing Management System is running!"
-if __name__ == '__main__':
+def create_app():
+    app = Flask(__name__)
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'inventory.db')
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    db.init_app(app)
+    
     with app.app_context():
-        db.create_all()  # Create tables if they don't exist
+        from models import Printer, Project, PrinterModel, Material, MaterialSpec, PrintJob
+        db.create_all()
+    @app.route('/')
+    def home():
+        return render_template('index.html')
+    
+    return app
+if __name__ == '__main__':
+    app = create_app()
     app.run(debug=True)
