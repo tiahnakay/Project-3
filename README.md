@@ -1,3 +1,28 @@
+# 3D Printing Management System
+
+### Project Description
+This application is a management tool for 3D printing labs. It allows users to track printing hardware (Printers) and manage the production queue (Projects). It is designed to streamline the workflow from project creation to live print tracking.
+
+### Installation Instructions
+1. Clone the repository to your local machine.
+2. Create a virtual environment: `python -m venv venv`.
+3. Activate the venv: `.\venv\Scripts\activate` (Windows).
+4. Install dependencies: `pip install flask flask-sqlalchemy`.
+
+### Database Setup
+The application uses **SQLite** for easy portability. 
+- The schema is automatically generated on the first run of the application via `db.create_all()`.
+- Alternatively, you can review the structure in `models.py` or the provided `schema.sql`.
+
+### Usage
+1. Launch the server: `python app.py`.
+2. Navigate to `http://127.0.0.1:5000` in your browser.
+3. **Important:** Register at least one printer using the "Register Printer" form.
+4. Add a project to the queue.
+5. Click **"Start Print"** to trigger a SQL Transaction that links the project to a printer and updates its status.
+
+
+
 ## Part I 
 ### 1. Orginal Functional Dependencies
 * **Printers**: printer_id -> model_name, serial_number, purchase_date, last_maintenance_date, firmware_version
