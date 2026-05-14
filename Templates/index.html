@@ -14,22 +14,43 @@
     </nav>
 
     <div class="container">
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
         <div class="row">
             <div class="col-md-4">
                 <div class="card shadow-sm mb-4">
                     <div class="card-body">
                         <h5 class="card-title">Quick Stats</h5>
-                        <p class="card-text">Active Projects: <strong>{{ p_count }}</strong></p>
-                        <p class="card-text">Printers Online: <strong>{{ pr_count }}</strong></p>
+                        <p class="card-text text-muted">Active Projects: <strong>{{ p_count }}</strong></p>
+                        <p class="card-text text-muted">Printers Online: <strong>{{ pr_count }}</strong></p>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">New Project</h5>
+                        <form action="/project/add" method="POST">
+                            <input type="text" name="project_name" class="form-control mb-2" placeholder="Project Name" required>
+                            <button type="submit" class="btn btn-success w-100">Create Project</button>
+                        </form>
                     </div>
                 </div>
 
                 <div class="card shadow-sm">
                     <div class="card-body">
-                        <h5 class="card-title">New Project</h5>
-                        <form action="/project/add" method="POST">
-                            <input type="text" name="project_name" class="form-control mb-2" placeholder="Project Name" required>
-                            <button type="submit" class="btn btn-success w-100">Add to Queue</button>
+                        <h5 class="card-title">Register Printer</h5>
+                        <form action="/printer/add" method="POST">
+                            <input type="text" name="serial" class="form-control mb-2" placeholder="Serial Number" required>
+                            <button type="submit" class="btn btn-primary w-100">Add Printer</button>
                         </form>
                     </div>
                 </div>
@@ -49,23 +70,27 @@
                         {% for project in projects %}
                         <tr>
                             <td>{{ project.project_name }}</td>
-                            <td><span class="badge bg-primary">{{ project.status }}</span></td>
+                            <td><span class="badge bg-info text-dark">{{ project.status }}</span></td>
                             <td>
                                 <form action="{{ url_for('start_print', id=project.project_id) }}" method="POST" style="display:inline;">
-                                    <button class="btn btn-sm btn-warning">Start Print</button>
+                                    <button type="submit" class="btn btn-sm btn-warning">Start Print</button>
                                 </form>
                                 <form action="{{ url_for('delete_project', id=project.project_id) }}" method="POST" style="display:inline;">
-                                    <button class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete?')">Delete</button>
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete?')">Delete</button>
                                 </form>
                             </td>
                         </tr>
                         {% else %}
-                        <tr><td colspan="3" class="text-center py-4">No projects found.</td></tr>
+                        <tr>
+                            <td colspan="3" class="text-center text-muted py-4">No active projects found.</td>
+                        </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

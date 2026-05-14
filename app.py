@@ -5,7 +5,7 @@ import os
 
 def create_app():
     app = Flask(__name__)
-    app.secret_key = 'shocker_studios_secret' # Required for flashing messages
+    app.secret_key = 'shocker_studios_secret'
     
     basedir = os.path.abspath(os.path.dirname(__file__))
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'inventory.db')
@@ -23,7 +23,6 @@ def create_app():
         p_count = db.session.query(func.count(Project.project_id)).scalar()
         pr_count = db.session.query(func.count(Printer.printer_id)).scalar()
         
-        # Requirement: Relationship Management (Read)
         projects = Project.query.all()
         return render_template('index.html', projects=projects, p_count=p_count, pr_count=pr_count)
 
@@ -40,6 +39,15 @@ def create_app():
         db.session.commit()
         return redirect(url_for('home'))
 
+    @app.route('/printer/add', methods=['POST'])
+    def add_printer():
+        serial = request.form.get('serial')
+        if serial:
+            new_printer = Printer(serial_number=serial)
+            db.session.add(new_printer)
+            db.session.commit()
+        return redirect(url_for('home'))
+
     @app.route('/project/delete/<int:id>', methods=['POST'])
     def delete_project(id):
         project = Project.query.get_or_404(id)
@@ -51,15 +59,24 @@ def create_app():
     def start_print(id):
         project = Project.query.get_or_404(id)
         # Requirement: Transaction Logic (Multi-step update)
+        # We grab the first available printer to complete the transaction
+        printer = Printer.query.first()
+        
+        if not printer:
+            flash("Error: No printers registered. Please add a printer first!")
+            return redirect(url_for('home'))
+
         try:
+            # Step 1: Update Status
             project.status = "Printing..."
-            # Placeholder: In a full app, you'd select a printer ID here
-            new_job = PrintJob(project_id=id) 
+            # Step 2: Create Print Job link
+            new_job = PrintJob(project_id=id, printer_id=printer.printer_id) 
             db.session.add(new_job)
             db.session.commit()
         except:
             db.session.rollback()
-            flash("Error processing print transaction.")
+            flash("Transaction failed.")
+            
         return redirect(url_for('home'))
 
     return app
